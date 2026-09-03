@@ -39,6 +39,7 @@
     --b-verde:#4E9D5A;
     --b-amarilla:#DDC04A;
     --b-azul:#4C80D2;
+    --b-morada:#8C6DB0;
     --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     --cond:"Barlow Condensed","Arial Narrow",var(--sans);
     --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -247,7 +248,7 @@
     font-variant-numeric:tabular-nums;letter-spacing:-.02em;padding:0;min-width:0;
   }
   .spin input::-webkit-outer-spin-button,.spin input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .bands{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .bands{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .bands button{
     min-height:var(--tap);border-radius:9px;border:1px solid var(--line);
     background:var(--bg);display:flex;flex-direction:column;align-items:center;
@@ -450,9 +451,10 @@
   /* ============================================================
      1. DATOS
      ============================================================ */
-  var KEY = "bitacora-fuerza-v1";
+  var KEY = "bitacora-fuerza-v2";
+  var OLDKEYS = ["bitacora-fuerza-v1"];
   var PKEY = "bitacora-fotos-v1";
-  var BANDS = ["amarilla","roja","verde","azul","negra"];
+  var BANDS = ["amarilla","roja","verde","azul","negra","morada"];
   var DAYS = [
     {id:"empuje", name:"Empuje"},
     {id:"tiron",  name:"Tirón"},
@@ -492,21 +494,21 @@
       },
       sessions:[
         { id:"s-empuje-1", date:"2026-09-01", routine:"empuje", sets:[
-          {ex:"e1", reps:14, w:12.5}, {ex:"e1", reps:12, w:15},
-          {ex:"e2", reps:12, w:12.5}, {ex:"e2", reps:10, w:15},
-          {ex:"e3", reps:12, w:29},   {ex:"e3", reps:14, w:36},
-          {ex:"e4", reps:14, band:"negra"}, {ex:"e4", reps:14, band:"negra"},
-          {ex:"e5", reps:14, band:"roja"},  {ex:"e5", reps:14, band:"roja"},
-          {ex:"e6", reps:14, w:9},    {ex:"e6", reps:14, w:14},
-          {ex:"e7", reps:14, w:9},    {ex:"e7", reps:12, w:11.3}
+          {ex:"e1", reps:14, w:12.5}, {ex:"e1", reps:12, w:15}, {ex:"e1", reps:12, w:17.5}, {ex:"e1", reps:10, w:20},
+          {ex:"e2", reps:12, w:12.5}, {ex:"e2", reps:10, w:15}, {ex:"e2", reps:10, w:17.5},
+          {ex:"e3", reps:12, w:29},   {ex:"e3", reps:14, w:36}, {ex:"e3", reps:14, w:43},
+          {ex:"e4", reps:14, band:"negra"}, {ex:"e4", reps:14, band:"negra"}, {ex:"e4", reps:14, band:"negra"},
+          {ex:"e5", reps:14, band:"roja"},  {ex:"e5", reps:14, band:"roja"},  {ex:"e5", reps:14, band:"roja"},
+          {ex:"e6", reps:14, w:9},    {ex:"e6", reps:14, w:14}, {ex:"e6", reps:10, w:16.3}, {ex:"e6", reps:10, w:14},
+          {ex:"e7", reps:14, w:9},    {ex:"e7", reps:12, w:11.3}, {ex:"e7", reps:12, w:15.6}
         ]},
         { id:"s-tiron-1", date:"2026-09-02", routine:"tiron", sets:[
-          {ex:"t1", reps:14, w:39},   {ex:"t1", reps:12, w:45},
-          {ex:"t2", reps:14, w:13.5}, {ex:"t2", reps:12, w:15.8},
-          {ex:"t3", reps:12, w:32},   {ex:"t3", reps:12, w:34.3},
-          {ex:"t4", reps:12, w:15.8}, {ex:"t4", reps:12, w:22.5},
-          {ex:"t5", reps:12, w:7.5},  {ex:"t5", reps:10, w:7.5},
-          {ex:"t6", reps:12, w:9.3},  {ex:"t6", reps:8,  w:11.3}
+          {ex:"t1", reps:14, w:39},   {ex:"t1", reps:12, w:45}, {ex:"t1", reps:12, w:47.3}, {ex:"t1", reps:10, w:52},
+          {ex:"t2", reps:14, w:13.5}, {ex:"t2", reps:12, w:15.8}, {ex:"t2", reps:10, w:18}, {ex:"t2", reps:10, w:20.3},
+          {ex:"t3", reps:12, w:32},   {ex:"t3", reps:12, w:34.3}, {ex:"t3", reps:12, w:39}, {ex:"t3", reps:10, w:41.3},
+          {ex:"t4", reps:12, w:15.8}, {ex:"t4", reps:12, w:22.5}, {ex:"t4", reps:12, band:"negra"}, {ex:"t4", reps:12, band:"morada"},
+          {ex:"t5", reps:12, w:7.5},  {ex:"t5", reps:10, w:7.5}, {ex:"t5", reps:10, w:7.5},
+          {ex:"t6", reps:12, w:9.3},  {ex:"t6", reps:8,  w:11.3}, {ex:"t6", reps:12, w:6.8}
         ]}
       ]
     };
@@ -622,7 +624,10 @@
   function load(){
     try{
       var raw = localStorage.getItem(KEY);
-      if(!raw) return seed();
+      if(!raw){
+        OLDKEYS.forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+        return seed();
+      }
       var d = JSON.parse(raw);
       if(!d || !d.routines || !d.sessions) return seed();
       if(!d.settings) d.settings = {rest:90};
