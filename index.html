@@ -605,6 +605,43 @@
     letter-spacing:.06em;text-transform:uppercase;
   }
 
+  .inicio{padding:22px 0 8px}
+  .inicio h2{
+    font-family:var(--cond);font-size:26px;font-weight:600;letter-spacing:.01em;
+    color:var(--text);margin-bottom:5px;
+  }
+  .inicio > p{color:var(--text-3);font-size:13.5px;line-height:1.5;margin-bottom:18px}
+  .opciones{display:flex;flex-direction:column;gap:10px}
+  .op{
+    display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+    padding:14px;border-radius:var(--r);border:1px solid var(--line);
+    background:var(--surface);color:var(--text);
+  }
+  .op .ini{
+    flex:none;width:46px;height:46px;border-radius:12px;display:flex;
+    align-items:center;justify-content:center;font-family:var(--cond);
+    font-size:22px;font-weight:700;color:#15120F;
+  }
+  .op.empuje .ini{background:var(--r-empuje)}
+  .op.tiron  .ini{background:var(--r-tiron)}
+  .op.pierna .ini{background:var(--r-pierna)}
+  .op .txt{flex:1;min-width:0}
+  .op .txt b{
+    display:block;font-family:var(--cond);font-size:19px;font-weight:600;
+    letter-spacing:.02em;text-transform:uppercase;
+  }
+  .op .txt span{display:block;margin-top:2px;font-size:12.5px;color:var(--text-3)}
+  .op .go{
+    flex:none;font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--accent);padding:8px 12px;border-radius:8px;
+    background:rgba(242,160,61,.12);border:1px solid var(--accent-dim);
+  }
+  .inicio .pie{
+    margin-top:18px;padding-top:14px;border-top:1px solid var(--line-soft);
+    color:var(--text-3);font-size:13px;line-height:1.5;
+  }
+  .inicio .pie b{color:var(--text-2);font-weight:600}
+
   [hidden]{display:none!important}
 
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -659,6 +696,7 @@
   var KEY = "bitacora-fuerza-v2";
   var OLDKEYS = ["bitacora-fuerza-v1"];
   var PKEY = "bitacora-fotos-v1";
+  var UIKEY = "bitacora-sitio-v1";
   var BANDS = ["amarilla","roja","verde","azul","negra","morada"];
   var DAYS = [
     {id:"empuje", name:"Empuje"},
@@ -676,7 +714,7 @@
 
   function seed(){
     return {
-      v:3,
+      v:4,
       settings:{rest:90, autoRest:true},
       perfil:{nombre:"", altura:null, nacimiento:"", objetivo:null, metaSemanal:3},
       pesos:[],
@@ -705,7 +743,7 @@
           {id:"p3", name:"Peso Muerto Rumano",     equip:"Barra",      mode:"kg"},
           {id:"p4", name:"Extensión de Cuádriceps",equip:"Máquina",    mode:"kg"},
           {id:"p5", name:"Curl Femoral",           equip:"Máquina",    mode:"kg"},
-          {id:"p6", name:"Gemelos",                equip:"Máquina",    mode:"kg"}
+          {id:"p6", name:"Gemelos",                equip:"Barra guiada", mode:"kg"}
         ]
       },
       sessions:[
@@ -725,6 +763,13 @@
           {ex:"t4", reps:12, w:15.8}, {ex:"t4", reps:12, w:22.5}, {ex:"t4", reps:12, band:"negra"}, {ex:"t4", reps:12, band:"morada"},
           {ex:"t5", reps:12, w:7.5},  {ex:"t5", reps:10, w:7.5}, {ex:"t5", reps:10, w:7.5},
           {ex:"t6", reps:12, w:9.3},  {ex:"t6", reps:8,  w:11.3}, {ex:"t6", reps:12, w:6.8}
+        ]},
+        { id:"s-pierna-1", date:"2026-09-03", routine:"pierna", sets:[
+          {ex:"p1", reps:12, w:1},    {ex:"p1", reps:12, w:20},  {ex:"p1", reps:12, w:30},  {ex:"p1", reps:6,  w:40},
+          {ex:"p2", reps:12, w:30},   {ex:"p2", reps:12, w:40},  {ex:"p2", reps:12, w:50},  {ex:"p2", reps:12, w:50},
+          {ex:"p4", reps:12, w:23},   {ex:"p4", reps:12, w:43},  {ex:"p4", reps:12, w:50},  {ex:"p4", reps:8,  w:63},
+          {ex:"p5", reps:12, w:36},   {ex:"p5", reps:12, w:50},  {ex:"p5", reps:12, w:63},  {ex:"p5", reps:8,  w:77},
+          {ex:"p6", reps:16, w:2.5},  {ex:"p6", reps:12, w:30},  {ex:"p6", reps:12, w:60},  {ex:"p6", reps:12, w:80}
         ]}
       ]
     };
@@ -858,13 +903,45 @@
     if(d.perfil.metaSemanal == null) d.perfil.metaSemanal = 3;
     if(!Array.isArray(d.pesos)) d.pesos = [];
     if(!Array.isArray(d.medidas)) d.medidas = [];
-    d.v = 3;
+
+    if(!(d.v >= 4)){
+      /* Corrección puntual del historial: el botón de "cargar sesión" había dejado
+         entrenos que no se hicieron. Se deja el historial real y se respeta
+         cualquier cosa apuntada después del 3 de septiembre. */
+      var reales = seed().sessions;
+      var posteriores = d.sessions.filter(function(x){ return x.date > "2026-09-03"; });
+      d.sessions = reales.concat(posteriores);
+      /* los gemelos se hacen en barra guiada */
+      (d.routines.pierna || []).forEach(function(ex){
+        if(ex.id === "p6" && ex.equip === "Máquina") ex.equip = "Barra guiada";
+      });
+      d.v = 4;
+    }
+
+    /* una sesión sin ninguna serie no es un entreno: se descarta al abrir */
+    var hoy = todayISO();
+    d.sessions = d.sessions.filter(function(x){
+      return (x.sets && x.sets.length) || x.date === hoy;
+    });
     return d;
   }
   function save(){
     try{ localStorage.setItem(KEY, JSON.stringify(S)); }
     catch(e){ toast("No se pudo guardar"); }
   }
+  /* dónde estabas: bloque, ejercicio abierto y descanso en marcha */
+  function guardarUI(){
+    try{
+      localStorage.setItem(UIKEY, JSON.stringify({
+        day: ui.day, open: ui.open, fin: timer.fin || 0, total: timer.total || 0
+      }));
+    }catch(e){}
+  }
+  function leerUI(){
+    try{ return JSON.parse(localStorage.getItem(UIKEY)) || {}; }
+    catch(e){ return {}; }
+  }
+
   function loadPhotos(){
     try{ return JSON.parse(localStorage.getItem(PKEY)) || {}; }
     catch(e){ return {}; }
@@ -1196,7 +1273,34 @@
   /* ============================================================
      4. TEMPORIZADOR DE DESCANSO
      ============================================================ */
-  var timer = { left:0, total:0, tick:null };
+  /* El descanso se guarda como hora de fin, no como segundos restantes:
+     así sigue corriendo aunque cierres la app y vuelvas a entrar. */
+  var timer = { left:0, total:0, tick:null, fin:0 };
+
+  function latir(){
+    if(timer.tick) return;
+    timer.tick = setInterval(function(){
+      timer.left = Math.max(0, Math.round((timer.fin - Date.now())/1000));
+      if(timer.left <= 0){
+        clearInterval(timer.tick); timer.tick = null;
+        timer.fin = 0; guardarUI();
+        if(navigator.vibrate) try{ navigator.vibrate([120,60,120]); }catch(e){}
+        toast("Descanso terminado");
+      }
+      renderClock();
+    }, 250);
+  }
+
+  /* al volver a la app se recalcula con el reloj, no con lo que quedó en memoria */
+  function retomarDescanso(fin, total){
+    if(!fin || fin <= Date.now()) return false;
+    timer.fin = fin;
+    timer.total = total || S.settings.rest;
+    timer.left = Math.max(0, Math.round((fin - Date.now())/1000));
+    latir();
+    return true;
+  }
+
   function renderClock(){
     var r = $("#rest"), c = $("#clock"), b = $("#bar");
     var v = timer.left > 0 ? timer.left : (timer.total && timer.tick===null ? 0 : S.settings.rest);
@@ -1210,21 +1314,15 @@
     stopRest(true);
     timer.total = sec || S.settings.rest;
     timer.left = timer.total;
+    timer.fin = Date.now() + timer.total*1000;
+    guardarUI();
     renderClock();
-    timer.tick = setInterval(function(){
-      timer.left--;
-      if(timer.left <= 0){
-        timer.left = 0;
-        clearInterval(timer.tick); timer.tick = null;
-        if(navigator.vibrate) try{ navigator.vibrate([120,60,120]); }catch(e){}
-        toast("Descanso terminado");
-      }
-      renderClock();
-    }, 1000);
+    latir();
   }
   function stopRest(quiet){
     if(timer.tick){ clearInterval(timer.tick); timer.tick = null; }
-    timer.left = 0; timer.total = 0;
+    timer.left = 0; timer.total = 0; timer.fin = 0;
+    guardarUI();
     if(!quiet) renderClock();
   }
   $("#clock").addEventListener("click", function(){
@@ -1232,12 +1330,13 @@
   });
   $("#restMinus").addEventListener("click", function(){
     if(!timer.tick){ S.settings.rest = Math.max(15, S.settings.rest - 15); save(); }
-    else timer.left = Math.max(1, timer.left - 15);
+    else { timer.fin -= 15000; timer.left = Math.max(0, Math.round((timer.fin-Date.now())/1000)); guardarUI(); }
     renderClock();
   });
   $("#restPlus").addEventListener("click", function(){
     if(!timer.tick){ S.settings.rest = Math.min(600, S.settings.rest + 15); save(); }
-    else { timer.left += 15; timer.total = Math.max(timer.total, timer.left); }
+    else { timer.fin += 15000; timer.left = Math.round((timer.fin-Date.now())/1000);
+           timer.total = Math.max(timer.total, timer.left); guardarUI(); }
     renderClock();
   });
 
@@ -1275,7 +1374,7 @@
      ============================================================ */
   function renderDays(){
     var el = $("#days");
-    el.hidden = ui.view !== "log";
+    el.hidden = ui.view !== "log" || enPortada();
     if(el.hidden) return;
     el.innerHTML = DAYS.map(function(d){
       var n = 0, t = fechaActiva();
@@ -1288,8 +1387,11 @@
       } else {
         var u = ultimaDe(d.id);
         var dd = u ? diasEntre(u, t) : null;
-        pie = dd === null ? exercises(d.id).length + " ejercicios"
-            : dd === 0   ? "hecho hoy"
+        var abierta = false;
+        S.sessions.forEach(function(x){ if(x.routine===d.id && x.date===t) abierta = true; });
+        pie = abierta      ? "en marcha"
+            : dd === null  ? exercises(d.id).length + " ejercicios"
+            : dd === 0     ? "hecho hoy"
             : dd === 1   ? "ayer"
             : "hace " + dd + " días";
       }
@@ -1298,11 +1400,51 @@
     }).join("");
   }
 
+  /* ¿hay algún entreno abierto hoy, sea la rutina que sea? */
+  function entrenoDeHoy(){
+    var t = todayISO();
+    for(var i=0;i<S.sessions.length;i++) if(S.sessions[i].date === t) return S.sessions[i];
+    return null;
+  }
+
+  function enPortada(){ return ui.view === "log" && esHoy() && !entrenoDeHoy(); }
+
+  function renderInicio(){
+    var r = resumen();
+    var h = '<div class="inicio">' +
+      '<h2>¿Qué entrenas hoy?</h2>' +
+      '<p>Elige el bloque y empezamos a contar. Puedes cambiarlo luego.</p>' +
+      '<div class="opciones">';
+    DAYS.forEach(function(d){
+      var u = ultimaDe(d.id);
+      var dd = u ? diasEntre(u, todayISO()) : null;
+      var pie = dd === null ? plural(exercises(d.id).length,"ejercicio","ejercicios")
+              : dd === 0 ? "hecho hoy"
+              : dd === 1 ? "última vez ayer"
+              : "última vez hace " + dd + " días";
+      h += '<button class="op '+d.id+'" data-act="empezar" data-d="'+d.id+'">' +
+           '<span class="ini">'+esc(d.name.charAt(0))+'</span>' +
+           '<span class="txt"><b>'+esc(d.name)+'</b><span>'+esc(pie)+'</span></span>' +
+           '<span class="go">Empezar</span></button>';
+    });
+    h += '</div>';
+    h += '<div class="pie">' +
+      (r.dias === null ? 'Aún no hay entrenos apuntados.'
+        : r.dias === 0 ? 'Ya has entrenado hoy.'
+        : r.dias === 1 ? 'Tu último entreno fue ayer.'
+        : 'Tu último entreno fue hace '+r.dias+' días.') +
+      ' Esta semana llevas <b>'+r.semana+' de '+(S.perfil.metaSemanal||3)+'</b>.</div>';
+    h += '</div>';
+    return h;
+  }
+
   function renderLog(){
     var ses = sesionActiva(false);
     var sets = ses ? ses.sets : [];
     var vol = volume(sets);
-    var prev = prevSession();
+
+    /* si hoy no se ha empezado nada todavía, primero se elige el bloque */
+    if(esHoy() && !entrenoDeHoy()) return renderInicio();
 
     var h = "";
     if(!esHoy()){
@@ -1314,17 +1456,11 @@
     h += '<div class="strip">' +
       '<div class="k'+(sets.length?"":" zero")+'"><b>'+sets.length+'</b><span>Series</span></div>' +
       '<div class="k'+(vol?"":" zero")+'"><b>'+num(vol,0)+'<small>kg</small></b><span>Volumen</span></div>' +
-      (prev ? '<div class="k"><b style="font-size:14px">'+esc(fmtDate(prev.date,{day:"numeric",month:"short"}))+'</b><span>Previa</span></div>' : '') +
+
       '<div class="spacer"></div>' +
       (ui.edit && sets.length ? '<button class="linkbtn dang" data-act="clear">'+(ui.confirm==="clear"?"¿Seguro?":"Vaciar")+'</button>' : '') +
       '<button class="linkbtn" data-act="edit" aria-pressed="'+ui.edit+'">'+(ui.edit?"Listo":"Editar")+'</button>' +
       '</div>';
-
-    if(prev && !sets.length){
-      h += '<button class="repeat" data-act="repeat">Cargar sesión del '+
-           esc(fmtDate(prev.date,{day:"numeric",month:"short"}).replace(".",""))+
-           ' · '+plural(prev.sets.length,"serie","series")+'</button>';
-    }
 
     h += '<div class="list">';
     var list = exercises(ui.day);
@@ -1593,6 +1729,9 @@
           h += '<p style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line-soft);color:var(--text-2);font-size:13px;line-height:1.5">'+
                esc(s.nota)+'</p>';
         }
+        h += '<div class="btnrow" style="margin-top:12px">' +
+             '<button class="btn danger" data-act="rmses" data-id="'+s.id+'">'+
+             (ui.confirm === s.id ? "¿Seguro? Toca otra vez" : "Borrar este entreno")+'</button></div>';
         h += '</div>';
       }
       h += '</div>';
@@ -1824,7 +1963,7 @@
     v.innerHTML = ui.view === "log" ? renderLog() : ui.view === "prog" ? renderProg() : renderPerfil();
 
     var dock = $("#dock");
-    dock.hidden = ui.view !== "log";
+    dock.hidden = ui.view !== "log" || enPortada();
     if(!dock.hidden){
       var ses = sesionActiva(false), sets = ses ? ses.sets : [];
       $("#sum").innerHTML = sets.length
@@ -1863,6 +2002,7 @@
     ui.adding = false; ui.editSet = null;
     var f = exercises(ui.day)[0];
     if(f) ui.open = f.id;
+    guardarUI();
     render();
   });
 
@@ -1871,7 +2011,10 @@
     if(!b || b.tagName === "INPUT") return;
     var act = b.dataset.act, id = b.dataset.id;
 
-    if(act === "toggle"){ ui.open = (ui.open === id ? null : id); ui.confirm = null; ui.editSet = null; return render(); }
+    if(act === "toggle"){
+      ui.open = (ui.open === id ? null : id);
+      ui.confirm = null; ui.editSet = null; guardarUI(); return render();
+    }
     if(act === "edit"){ ui.edit = !ui.edit; ui.confirm = null; return render(); }
 
     if(act === "photo"){ pendingPhoto = id; $("#photoInput").click(); return; }
@@ -1881,16 +2024,26 @@
       PH = {}; savePhotos(); ui.confirm = null; toast("Fotos borradas"); return render();
     }
 
-    if(act === "repeat"){
-      var prev = prevSession(); if(!prev) return;
-      var t = sesionActiva(true);
-      prev.sets.forEach(function(s){
-        var c = {ex:s.ex, reps:s.reps};
-        if(s.band) c.band = s.band; else c.w = s.w;
-        t.sets.push(c);
-      });
-      save(); toast("Series cargadas · ajusta lo que cambie"); return render();
+    if(act === "rmses"){
+      if(ui.confirm !== id){ ui.confirm = id; return render(); }
+      S.sessions = S.sessions.filter(function(x){ return x.id !== id; });
+      ui.confirm = null; ui.open = null; save();
+      toast("Entreno borrado");
+      return render();
     }
+
+    if(act === "empezar"){
+      ui.day = b.dataset.d;
+      ui.fecha = null; ui.open = null; ui.confirm = null; ui.editSet = null; ui.edit = false;
+      var ns = sesionActiva(true);
+      ns.inicio = Date.now();
+      var f0 = exercises(ui.day)[0];
+      if(f0) ui.open = f0.id;
+      save(); guardarUI();
+      toast(dayName(ui.day) + " · a por ello");
+      return render();
+    }
+
     if(act === "clear"){
       if(ui.confirm !== "clear"){ ui.confirm = "clear"; return render(); }
       var cur = sesionActiva(false);
@@ -2182,8 +2335,11 @@
     });
   }
 
-  var first = exercises(ui.day)[0];
-  if(first) ui.open = first.id;
+  var sitio = leerUI();
+  if(sitio.day && S.routines[sitio.day]) ui.day = sitio.day;
+  if(sitio.open && findEx(sitio.open)) ui.open = sitio.open;
+  else { var first = exercises(ui.day)[0]; if(first) ui.open = first.id; }
+  retomarDescanso(sitio.fin, sitio.total);
   render();
 })();
 </script>
