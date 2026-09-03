@@ -130,22 +130,66 @@
     border:1px solid var(--line);border-radius:99px;padding:7px 13px;
   }
   .linkbtn[aria-pressed="true"]{color:var(--accent);border-color:var(--accent-dim)}
+  .linkbtn.dang{color:var(--danger);border-color:rgba(216,86,75,.35)}
+
+  .repeat{
+    width:100%;min-height:var(--tap);border-radius:var(--r);margin-top:12px;
+    border:1px solid var(--accent-dim);background:rgba(242,160,61,.09);color:var(--accent);
+    font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.06em;
+    text-transform:uppercase;padding:0 14px;
+  }
+
+  /* ---------- ilustraciones ---------- */
+  .art{display:block}
+  .art .fig{fill:none;stroke:var(--text-2);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .art .eq{fill:none;stroke:var(--accent);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .art .eqf{fill:var(--accent);stroke:none}
+  .art .base{fill:none;stroke:var(--line);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .thumb{
+    width:44px;height:44px;border-radius:10px;flex:none;overflow:hidden;
+    background:var(--surface-2);border:1px solid var(--line-soft);
+    display:grid;place-items:center;
+  }
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .ex.done .thumb{border-color:var(--accent-dim)}
+  .media{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center}
+  .shot{
+    width:88px;height:88px;border-radius:12px;flex:none;overflow:hidden;position:relative;
+    background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;padding:0;
+  }
+  .shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .shot .cam{
+    position:absolute;left:0;right:0;bottom:0;padding:3px 0;
+    background:rgba(19,17,16,.85);color:var(--text-3);
+    font-family:var(--cond);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  }
+  .cue{font-size:13px;color:var(--text-2);line-height:1.45}
+  .cue .lbl{
+    display:block;font-family:var(--cond);font-size:11px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--text-3);margin-bottom:3px;
+  }
+  .cue .rm{
+    display:inline-block;margin-top:7px;color:var(--text-3);text-align:left;
+    font-family:var(--cond);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    border-bottom:1px solid var(--line);
+  }
 
   /* ---------- ejercicio ---------- */
   .list{display:flex;flex-direction:column;gap:8px;padding-top:12px}
   .ex{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden}
   .ex.open{border-color:var(--line);background:var(--bg-2)}
   .exhd{
-    width:100%;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
-    text-align:left;padding:13px 14px;min-height:var(--tap);
+    width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;align-items:center;
+    text-align:left;padding:11px 14px;min-height:var(--tap);
   }
   .exname{font-weight:600;font-size:15.5px;letter-spacing:-.005em;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
   .equip{
     font-family:var(--cond);font-weight:600;font-size:11.5px;letter-spacing:.08em;
     text-transform:uppercase;color:var(--text-3);
   }
+  .extxt{display:block;min-width:0}
   .exlast{
-    font-family:var(--mono);font-size:11.5px;color:var(--text-3);
+    display:block;font-family:var(--mono);font-size:11.5px;color:var(--text-3);
     margin-top:3px;font-variant-numeric:tabular-nums;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
@@ -162,14 +206,15 @@
   .exbody{padding:0 14px 14px;display:flex;flex-direction:column;gap:12px}
   .sets{display:flex;flex-wrap:wrap;gap:6px}
   .setchip{
-    display:inline-flex;align-items:center;gap:8px;
+    display:inline-flex;align-items:center;
     background:var(--surface-2);border:1px solid var(--line);border-radius:8px;
-    padding:6px 6px 6px 10px;font-family:var(--mono);font-size:13px;
-    font-variant-numeric:tabular-nums;
+    font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;
   }
+  .setchip.editing{border-color:var(--accent);background:rgba(242,160,61,.13)}
+  .setchip .val{display:inline-flex;align-items:center;gap:8px;padding:7px 4px 7px 10px;color:inherit}
   .setchip i{width:7px;height:7px;border-radius:2px;flex:none;display:inline-block}
   .setchip .x{
-    width:26px;height:26px;border-radius:6px;display:grid;place-items:center;
+    width:30px;height:32px;border-radius:6px;display:grid;place-items:center;
     color:var(--text-3);font-size:15px;line-height:1;
   }
   .setchip .x:hover{color:var(--danger);background:rgba(216,86,75,.12)}
@@ -212,13 +257,19 @@
   }
   .bands button i{width:20px;height:6px;border-radius:3px;display:block}
   .bands button[aria-pressed="true"]{border-color:var(--accent);color:var(--text);background:var(--surface-2)}
+  .padbtns{display:flex;gap:8px;margin-top:10px}
   .add{
-    width:100%;min-height:var(--tap);margin-top:10px;border-radius:9px;
+    flex:1;min-height:var(--tap);border-radius:9px;
     background:var(--accent);color:var(--accent-ink);
     font-family:var(--cond);font-weight:700;font-size:17px;letter-spacing:.08em;
     text-transform:uppercase;
   }
   .add:active{background:#D98C2E}
+  .cancel{
+    min-height:var(--tap);padding:0 16px;border-radius:9px;border:1px solid var(--line);
+    background:var(--bg);color:var(--text-2);font-family:var(--cond);font-weight:600;
+    font-size:14px;letter-spacing:.07em;text-transform:uppercase;
+  }
   .hint{font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:8px;text-align:center}
   .hint b{color:var(--accent);font-weight:500}
 
@@ -309,7 +360,7 @@
   .prog .ph .n{font-weight:600;font-size:14.5px}
   .prog .ph .best{font-family:var(--mono);font-size:12.5px;color:var(--accent);font-variant-numeric:tabular-nums}
   .prog .note{font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:5px}
-  .prog svg{display:block;width:100%;height:60px;margin-top:9px}
+  .prog svg.chart{display:block;width:100%;height:60px;margin-top:9px}
 
   .empty{
     border:1px dashed var(--line);border-radius:var(--r);padding:24px 18px;text-align:center;
@@ -323,7 +374,7 @@
   .card h3{font-family:var(--cond);font-weight:700;font-size:16px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px}
   .card p{margin:0 0 11px;color:var(--text-2);font-size:13.5px;max-width:60ch}
   .card p:last-child{margin-bottom:0}
-  .card.warn{border-color:var(--accent-dim);background:linear-gradient(var(--surface),var(--surface))}
+  .card.warn{border-color:var(--accent-dim)}
   .card.warn h3{color:var(--accent)}
   textarea{
     width:100%;min-height:110px;resize:vertical;background:var(--bg);
@@ -346,6 +397,7 @@
     background:var(--text);color:var(--bg);padding:10px 16px;border-radius:99px;
     font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.06em;
     text-transform:uppercase;z-index:60;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;
+    max-width:88vw;text-align:center;
   }
   .toast.on{opacity:1;transform:translateX(-50%) translateY(-4px)}
 
@@ -353,6 +405,7 @@
   @media (max-width:360px){
     .bands{grid-template-columns:repeat(3,1fr)}
     .brandrow h1{font-size:21px}
+    .shot{width:74px;height:74px}
   }
 </style>
 
@@ -387,6 +440,7 @@
   </div>
 </div>
 
+<input type="file" id="photoInput" accept="image/*" hidden>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -397,26 +451,27 @@
      1. DATOS
      ============================================================ */
   var KEY = "bitacora-fuerza-v1";
+  var PKEY = "bitacora-fotos-v1";
   var BANDS = ["amarilla","roja","verde","azul","negra"];
   var DAYS = [
-    {id:"empuje", name:"Empuje", muscles:"pecho · hombro · tríceps"},
-    {id:"tiron",  name:"Tirón",  muscles:"espalda · bíceps"},
-    {id:"pierna", name:"Pierna", muscles:"cuádriceps · femoral"}
+    {id:"empuje", name:"Empuje"},
+    {id:"tiron",  name:"Tirón"},
+    {id:"pierna", name:"Pierna"}
   ];
 
   function seed(){
     return {
-      v:1,
+      v:2,
       settings:{rest:90},
       routines:{
         empuje:[
-          {id:"e1", name:"Press de Banca",           equip:"Mancuernas", mode:"kg"},
-          {id:"e2", name:"Press Inclinado",          equip:"Mancuernas", mode:"kg"},
-          {id:"e3", name:"Aperturas",                equip:"Peck Deck",  mode:"kg"},
-          {id:"e4", name:"Press Militar",            equip:"Banda",      mode:"banda"},
-          {id:"e5", name:"Elevaciones Laterales",    equip:"Banda",      mode:"banda"},
-          {id:"e6", name:"Tríceps Jalón",            equip:"Polea",      mode:"kg"},
-          {id:"e7", name:"Extensión Tríceps Superior",equip:"Polea",     mode:"kg"}
+          {id:"e1", name:"Press de Banca",            equip:"Mancuernas", mode:"kg"},
+          {id:"e2", name:"Press Inclinado",           equip:"Mancuernas", mode:"kg"},
+          {id:"e3", name:"Aperturas",                 equip:"Peck Deck",  mode:"kg"},
+          {id:"e4", name:"Press Militar",             equip:"Banda",      mode:"banda"},
+          {id:"e5", name:"Elevaciones Laterales",     equip:"Banda",      mode:"banda"},
+          {id:"e6", name:"Tríceps Jalón",             equip:"Polea",      mode:"kg"},
+          {id:"e7", name:"Extensión Tríceps Superior",equip:"Polea",      mode:"kg"}
         ],
         tiron:[
           {id:"t1", name:"Jalón al Pecho",       equip:"Polea alta",  mode:"kg"},
@@ -427,12 +482,12 @@
           {id:"t6", name:"Curl Martillo",        equip:"Polea",       mode:"kg"}
         ],
         pierna:[
-          {id:"p1", name:"Sentadilla",            equip:"Multipower", mode:"kg"},
-          {id:"p2", name:"Prensa de Piernas",     equip:"Máquina",    mode:"kg"},
-          {id:"p3", name:"Peso Muerto Rumano",    equip:"Barra",      mode:"kg"},
-          {id:"p4", name:"Extensión de Cuádriceps",equip:"Máquina",   mode:"kg"},
-          {id:"p5", name:"Curl Femoral",          equip:"Máquina",    mode:"kg"},
-          {id:"p6", name:"Gemelos",               equip:"Máquina",    mode:"kg"}
+          {id:"p1", name:"Sentadilla",             equip:"Multipower", mode:"kg"},
+          {id:"p2", name:"Prensa de Piernas",      equip:"Máquina",    mode:"kg"},
+          {id:"p3", name:"Peso Muerto Rumano",     equip:"Barra",      mode:"kg"},
+          {id:"p4", name:"Extensión de Cuádriceps",equip:"Máquina",    mode:"kg"},
+          {id:"p5", name:"Curl Femoral",           equip:"Máquina",    mode:"kg"},
+          {id:"p6", name:"Gemelos",                equip:"Máquina",    mode:"kg"}
         ]
       },
       sessions:[
@@ -457,8 +512,112 @@
     };
   }
 
+  /* ============================================================
+     2. ILUSTRACIONES
+     ============================================================ */
+  function db(x,y,w){
+    w = w || 6;
+    return '<path class="eq" d="M'+(x-w)+' '+y+'h'+(w*2)+'"/>' +
+      '<rect class="eqf" x="'+(x-w-4.6)+'" y="'+(y-4.6)+'" width="4.6" height="9.2" rx="1.6"/>' +
+      '<rect class="eqf" x="'+(x+w)+'" y="'+(y-4.6)+'" width="4.6" height="9.2" rx="1.6"/>';
+  }
+  function barra(x1,x2,y){
+    return '<path class="eq" d="M'+x1+' '+y+'H'+x2+'"/>' +
+      '<circle class="eqf" cx="'+x1+'" cy="'+y+'" r="4"/>' +
+      '<circle class="eqf" cx="'+x2+'" cy="'+y+'" r="4"/>';
+  }
+  function pul(x,y){ return '<circle class="eqf" cx="'+x+'" cy="'+y+'" r="3.2"/>'; }
+
+  var FS = '<circle class="fig" cx="32" cy="14" r="3.6"/><path class="fig" d="M32 18v17M32 35l-6 16M32 35l6 16"/>';
+  var FL = '<circle class="fig" cx="34" cy="16" r="3.6"/><path class="fig" d="M34 20v15M34 35l-5 16M34 35l5 16"/>';
+  var BANCO = '<path class="base" d="M22 38h16M28 38v12M22 38V23"/>';
+
+  var ART = {
+    e1: '<path class="base" d="M12 42h32M18 42v9M38 42v9"/>' +
+        '<circle class="fig" cx="16" cy="35" r="3.4"/>' +
+        '<path class="fig" d="M20 37h16l6 5M29 36V26"/>' + db(29,23,7),
+    e2: '<path class="base" d="M14 50h26M18 50l16-15"/>' +
+        '<circle class="fig" cx="38" cy="31" r="3.4"/>' +
+        '<path class="fig" d="M35 34L22 46M34 32l-2-8"/>' + db(31,21,7),
+    e3: FS + '<path class="fig" d="M32 23l-11 5M32 23l11 5"/>' +
+        '<path class="eq" d="M13 38c0-10 4-16 8-19M51 38c0-10-4-16-8-19"/>' +
+        '<circle class="eqf" cx="20" cy="29" r="3.2"/><circle class="eqf" cx="44" cy="29" r="3.2"/>',
+    e4: FS + '<path class="fig" d="M32 22l-8-7M32 22l8-7"/>' +
+        '<path class="eq" d="M24 15c-9 10-8 27 1 36M40 15c9 10 8 27-1 36"/>',
+    e5: FS + '<path class="fig" d="M32 24H18M32 24h14"/>' +
+        '<path class="eq" d="M18 24c-6 8-4 20 5 26M46 24c6 8 4 20-5 26"/>',
+    e6: pul(48,10) + '<path class="eq" d="M48 13v11M38 26h12"/>' +
+        '<circle class="fig" cx="26" cy="16" r="3.4"/>' +
+        '<path class="fig" d="M26 20v16M26 36l-5 15M26 36l5 15M27 23l4 6 7-3"/>',
+    e7: pul(14,10) + '<path class="eq" d="M14 13c1 8 6 12 11 13M25 26h9"/>' +
+        '<circle class="fig" cx="38" cy="18" r="3.4"/>' +
+        '<path class="fig" d="M38 22v14M38 36l-5 15M38 36l5 15M38 24l-6-2-4 4"/>',
+    t1: '<path class="eq" d="M32 8v6"/>' + barra(17,47,14) +
+        '<circle class="fig" cx="32" cy="26" r="3.6"/>' +
+        '<path class="fig" d="M32 30v10M32 32l-8-15M32 32l8-15"/>' +
+        '<path class="base" d="M22 42h20M32 42v9"/>',
+    t2: pul(12,12) + '<path class="eq" d="M12 15c2 9 8 13 15 14M23 30h9"/>' +
+        FL + '<path class="fig" d="M34 25l-9 4"/>',
+    t3: pul(10,40) + '<path class="eq" d="M13 40h13M26 36v8"/>' +
+        '<circle class="fig" cx="40" cy="20" r="3.6"/>' +
+        '<path class="fig" d="M40 24v13M40 37H28M28 37l-6 6M40 27l-13 12"/>' +
+        '<path class="base" d="M26 45h20"/>',
+    t4: pul(12,12) + '<path class="eq" d="M15 14l9 5M24 19l7-3M24 19l4 7"/>' +
+        '<circle class="fig" cx="40" cy="20" r="3.6"/>' +
+        '<path class="fig" d="M40 24v13M40 37l-5 14M40 37l5 14M40 26l-8-5-4 5"/>',
+    t5: FS + '<path class="fig" d="M32 23l8 8v7M32 23l-8 7 5-5"/>' + db(29,24,5) + db(40,41,5),
+    t6: pul(50,40) + '<path class="eq" d="M47 40H38M38 30v8"/>' +
+        '<circle class="fig" cx="26" cy="16" r="3.4"/>' +
+        '<path class="fig" d="M26 20v16M26 36l-5 15M26 36l5 15M26 24l4 8 8 1"/>',
+    p1: '<circle class="fig" cx="30" cy="15" r="3.4"/>' +
+        '<path class="fig" d="M30 19v10M30 29l-8 9 3 12M30 29l7 9-3 12"/>' + barra(16,46,23),
+    p2: '<path class="base" d="M8 46h18M12 46v8M8 46V32"/>' +
+        '<circle class="fig" cx="14" cy="40" r="3.4"/>' +
+        '<path class="fig" d="M18 42h10l9-8"/>' +
+        '<path class="eq" d="M36 36l10-9"/>' +
+        '<rect class="eqf" x="43" y="14" width="9" height="13" rx="2.5"/>',
+    p3: '<circle class="fig" cx="20" cy="20" r="3.4"/>' +
+        '<path class="fig" d="M23 22h11M34 22v28M28 24v14"/>' + barra(18,40,40),
+    p4: BANCO + '<circle class="fig" cx="28" cy="17" r="3.4"/>' +
+        '<path class="fig" d="M28 21v13M28 34h10M38 34l9-7"/>' +
+        '<rect class="eqf" x="45" y="21" width="10" height="5" rx="2.5"/>',
+    p5: BANCO + '<circle class="fig" cx="28" cy="17" r="3.4"/>' +
+        '<path class="fig" d="M28 21v13M28 34h10M38 34l7 10"/>' +
+        '<rect class="eqf" x="42" y="43" width="10" height="5" rx="2.5"/>',
+    p6: '<path class="base" d="M18 50h28M20 50v5"/>' +
+        '<circle class="fig" cx="32" cy="14" r="3.6"/>' +
+        '<path class="fig" d="M32 18v16M32 34l-5 12 3 4M32 34l5 12-3 4"/>' +
+        '<rect class="eqf" x="21" y="20" width="22" height="5" rx="2.5"/>',
+    generic: db(32,32,9)
+  };
+
+  var CUES = {
+    e1:"Escápulas atrás y pecho alto. Baja controlado hasta rozar el pecho.",
+    e2:"Banco entre 30 y 45°. No arquees la lumbar para sacar la serie.",
+    e3:"Codos algo por debajo del hombro. Aprieta un segundo al cerrar.",
+    e4:"Glúteo y abdomen apretados. La banda no debe arquearte la espalda.",
+    e5:"Sube hasta la altura del hombro, sin coger impulso con el cuerpo.",
+    e6:"Codos pegados al costado. Solo se mueve el antebrazo.",
+    e7:"Codos mirando al frente y juntos. Controla mucho la bajada.",
+    t1:"Pecho arriba, lleva la barra al pecho tirando con los codos.",
+    t2:"Brazos casi rectos. El movimiento sale del dorsal, no del tríceps.",
+    t3:"Tira con los codos hacia atrás sin echar el torso.",
+    t4:"Codos por encima de las muñecas. Abre al final y aguanta.",
+    t5:"Sin balanceo. Baja más lento de lo que subes.",
+    t6:"Agarre neutro y muñeca firme. Sube sin mover el codo.",
+    p1:"Baja hasta romper el paralelo. Rodillas en línea con los pies.",
+    p2:"No bloquees las rodillas arriba ni redondees la espalda abajo.",
+    p3:"Cadera atrás, barra pegada a la pierna. Notas el femoral, no la lumbar.",
+    p4:"Aprieta un segundo arriba y baja despacio.",
+    p5:"Controla la vuelta. Nada de rebote al final.",
+    p6:"Rango completo: baja el talón del todo y pausa arriba.",
+    generic:"Anota el peso y las repeticiones de cada serie."
+  };
+
   var S = load();
-  var ui = { view:"log", day:"empuje", open:null, edit:false, confirm:null, adding:false };
+  var PH = loadPhotos();
+  var ui = { view:"log", day:"empuje", open:null, edit:false, confirm:null, adding:false, editSet:null };
+  var pendingPhoto = null;
 
   function load(){
     try{
@@ -474,9 +633,17 @@
     try{ localStorage.setItem(KEY, JSON.stringify(S)); }
     catch(e){ toast("No se pudo guardar"); }
   }
+  function loadPhotos(){
+    try{ return JSON.parse(localStorage.getItem(PKEY)) || {}; }
+    catch(e){ return {}; }
+  }
+  function savePhotos(){
+    try{ localStorage.setItem(PKEY, JSON.stringify(PH)); return true; }
+    catch(e){ toast("No cabe la foto en el móvil"); return false; }
+  }
 
   /* ============================================================
-     2. UTILIDADES
+     3. UTILIDADES
      ============================================================ */
   function $(s,r){ return (r||document).querySelector(s); }
   function esc(s){ return String(s).replace(/[&<>"']/g,function(c){
@@ -533,31 +700,41 @@
     S.sessions.push(s);
     return s;
   }
+  function prevSession(){
+    var sorted = sortedSessions(), t = todayISO();
+    for(var i=0;i<sorted.length;i++)
+      if(sorted[i].routine===ui.day && sorted[i].date !== t) return sorted[i];
+    return null;
+  }
   function setsOf(session, exId){
     if(!session) return [];
     return session.sets.filter(function(s){ return s.ex===exId; });
   }
-  /* sesiones anteriores (no la de hoy) que contienen este ejercicio */
   function historyOf(exId){
     var t = todayISO(), out = [];
     S.sessions.forEach(function(s){
       var sets = setsOf(s, exId);
-      if(sets.length && !(s.date===t)) out.push({date:s.date, sets:sets});
+      if(sets.length && s.date !== t) out.push({date:s.date, sets:sets});
     });
     out.sort(function(a,b){ return a.date < b.date ? -1 : 1; });
     return out;
   }
+  function svgArt(exId, px){
+    var d = ART[exId] || ART.generic;
+    return '<svg class="art" viewBox="0 0 64 64" width="'+px+'" height="'+px+'" aria-hidden="true">'+d+'</svg>';
+  }
+  function cueOf(exId){ return CUES[exId] || CUES.generic; }
   var toastT;
   function toast(msg){
     var el = $("#toast");
     el.textContent = msg;
     el.classList.add("on");
     clearTimeout(toastT);
-    toastT = setTimeout(function(){ el.classList.remove("on"); }, 1600);
+    toastT = setTimeout(function(){ el.classList.remove("on"); }, 1800);
   }
 
   /* ============================================================
-     3. TEMPORIZADOR DE DESCANSO
+     4. TEMPORIZADOR DE DESCANSO
      ============================================================ */
   var timer = { left:0, total:0, tick:null };
   function renderClock(){
@@ -594,18 +771,47 @@
     if(timer.tick) stopRest(); else startRest();
   });
   $("#restMinus").addEventListener("click", function(){
-    if(!timer.tick) { S.settings.rest = Math.max(15, S.settings.rest - 15); save(); }
-    else { timer.left = Math.max(1, timer.left - 15); }
+    if(!timer.tick){ S.settings.rest = Math.max(15, S.settings.rest - 15); save(); }
+    else timer.left = Math.max(1, timer.left - 15);
     renderClock();
   });
   $("#restPlus").addEventListener("click", function(){
-    if(!timer.tick) { S.settings.rest = Math.min(600, S.settings.rest + 15); save(); }
+    if(!timer.tick){ S.settings.rest = Math.min(600, S.settings.rest + 15); save(); }
     else { timer.left += 15; timer.total = Math.max(timer.total, timer.left); }
     renderClock();
   });
 
   /* ============================================================
-     4. VISTA: ENTRENO
+     5. FOTOS PROPIAS
+     ============================================================ */
+  $("#photoInput").addEventListener("change", function(e){
+    var f = e.target.files && e.target.files[0];
+    var id = pendingPhoto;
+    e.target.value = "";
+    if(!f || !id) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var max = 240;
+        var side = Math.min(img.width, img.height);
+        var cv = document.createElement("canvas");
+        cv.width = max; cv.height = max;
+        var cx = cv.getContext("2d");
+        cx.drawImage(img, (img.width-side)/2, (img.height-side)/2, side, side, 0, 0, max, max);
+        PH[id] = cv.toDataURL("image/jpeg", 0.72);
+        if(savePhotos()){ toast("Foto guardada"); render(); }
+        else { delete PH[id]; }
+      };
+      img.onerror = function(){ toast("No se pudo leer la imagen"); };
+      img.src = reader.result;
+    };
+    reader.onerror = function(){ toast("No se pudo leer la imagen"); };
+    reader.readAsDataURL(f);
+  });
+
+  /* ============================================================
+     6. VISTA: ENTRENO
      ============================================================ */
   function renderDays(){
     var el = $("#days");
@@ -623,19 +829,22 @@
     var ses = todaySession(false);
     var sets = ses ? ses.sets : [];
     var vol = volume(sets);
-    var prev = null;
-    var sorted = sortedSessions();
-    for(var i=0;i<sorted.length;i++){
-      if(sorted[i].routine===ui.day && sorted[i].date !== todayISO()){ prev = sorted[i]; break; }
-    }
+    var prev = prevSession();
 
     var h = '<div class="strip">' +
       '<div class="k'+(sets.length?"":" zero")+'"><b>'+sets.length+'</b><span>Series</span></div>' +
       '<div class="k'+(vol?"":" zero")+'"><b>'+num(vol,0)+'<small>kg</small></b><span>Volumen</span></div>' +
       (prev ? '<div class="k"><b style="font-size:14px">'+esc(fmtDate(prev.date,{day:"numeric",month:"short"}))+'</b><span>Previa</span></div>' : '') +
       '<div class="spacer"></div>' +
+      (ui.edit && sets.length ? '<button class="linkbtn dang" data-act="clear">'+(ui.confirm==="clear"?"¿Seguro?":"Vaciar")+'</button>' : '') +
       '<button class="linkbtn" data-act="edit" aria-pressed="'+ui.edit+'">'+(ui.edit?"Listo":"Editar")+'</button>' +
       '</div>';
+
+    if(prev && !sets.length){
+      h += '<button class="repeat" data-act="repeat">Cargar sesión del '+
+           esc(fmtDate(prev.date,{day:"numeric",month:"short"}).replace(".",""))+
+           ' · '+plural(prev.sets.length,"serie","series")+'</button>';
+    }
 
     h += '<div class="list">';
     var list = exercises(ui.day);
@@ -647,22 +856,24 @@
       var hist = historyOf(ex.id);
       var last = hist.length ? hist[hist.length-1] : null;
       var open = ui.open === ex.id;
+      var photo = PH[ex.id];
 
       h += '<article class="ex'+(open?" open":"")+(mine.length?" done":"")+'" data-ex="'+ex.id+'">';
 
       h += '<button class="exhd" data-act="toggle" data-id="'+ex.id+'">';
-      h += '<div><div class="exname">'+esc(ex.name)+
-           (ex.equip?'<span class="equip">'+esc(ex.equip)+'</span>':'')+'</div>';
+      h += '<span class="thumb">' + (photo ? '<img src="'+photo+'" alt="">' : svgArt(ex.id,34)) + '</span>';
+      h += '<span class="extxt"><span class="exname">'+esc(ex.name)+
+           (ex.equip?'<span class="equip">'+esc(ex.equip)+'</span>':'')+'</span>';
       if(last){
-        h += '<div class="exlast">Última vez · <em>'+
+        h += '<span class="exlast">Última vez · <em>'+
              last.sets.map(setShort).join(" · ")+'</em> · '+
-             esc(fmtDate(last.date,{day:"numeric",month:"short"}))+'</div>';
+             esc(fmtDate(last.date,{day:"numeric",month:"short"}))+'</span>';
       } else {
-        h += '<div class="exlast">Sin registro previo</div>';
+        h += '<span class="exlast">Sin registro previo</span>';
       }
-      h += '</div><div class="exmeta">'+
+      h += '</span><span class="exmeta">'+
            (mine.length?'<span class="pill">'+mine.length+'</span>':'')+
-           '<span class="chev"></span></div></button>';
+           '<span class="chev"></span></span></button>';
 
       if(ui.edit){
         h += '<div class="exedit">' +
@@ -679,11 +890,24 @@
 
       if(open){
         h += '<div class="exbody">';
+
+        h += '<div class="media">' +
+          '<button class="shot" data-act="photo" data-id="'+ex.id+'" aria-label="Cambiar la imagen del ejercicio">' +
+          (photo ? '<img src="'+photo+'" alt="">' : svgArt(ex.id,64)) +
+          '<span class="cam">'+(photo?"Cambiar":"Tu foto")+'</span></button>' +
+          '<span class="cue"><span class="lbl">Técnica</span>'+esc(cueOf(ex.id))+
+          (photo ? '<button class="rm" data-act="rmphoto" data-id="'+ex.id+'">Quitar foto</button>' : '') +
+          '</span></div>';
+
+        var editing = ui.editSet && ui.editSet.ex === ex.id ? ui.editSet.i : -1;
+
         if(mine.length){
           h += '<div class="sets">' + mine.map(function(s){
             var i = ses.sets.indexOf(s);
             var col = s.band ? "var(--b-"+s.band+")" : "var(--accent)";
-            return '<span class="setchip"><i style="background:'+col+'"></i>'+esc(setText(s))+
+            return '<span class="setchip'+(i===editing?" editing":"")+'">' +
+              '<button class="val" data-act="editset" data-id="'+ex.id+'" data-i="'+i+'">' +
+              '<i style="background:'+col+'"></i>'+esc(setText(s))+'</button>' +
               '<button class="x" data-act="rmset" data-i="'+i+'" aria-label="Borrar serie">×</button></span>';
           }).join("") + '</div>';
         }
@@ -699,8 +923,15 @@
           preR = lastMine.reps;
           if(lastMine.band) preB = lastMine.band;
         }
+        if(editing >= 0){
+          var cur = ses.sets[editing];
+          preW = cur.w ? num(cur.w) : "";
+          preR = cur.reps;
+          if(cur.band) preB = cur.band;
+          band = !!cur.band;
+        }
 
-        h += '<div class="pad" data-mode="'+(band?"banda":"kg")+'">';
+        h += '<div class="pad">';
         h += '<div class="modes">' +
           '<button data-act="setmode" data-id="'+ex.id+'" data-m="kg" aria-pressed="'+(!band)+'">Peso (kg)</button>' +
           '<button data-act="setmode" data-id="'+ex.id+'" data-m="banda" aria-pressed="'+band+'">Banda</button>' +
@@ -728,8 +959,13 @@
           }).join("") + '</div>';
         }
 
-        h += '<button class="add" data-act="add" data-id="'+ex.id+'">Añadir serie</button>';
-        h += '<div class="hint">Se guarda al instante · descanso de <b>'+S.settings.rest+' s</b></div>';
+        h += '<div class="padbtns"><button class="add" data-act="add" data-id="'+ex.id+'">'+
+             (editing>=0 ? "Guardar cambios" : "Añadir serie")+'</button>' +
+             (editing>=0 ? '<button class="cancel" data-act="canceledit">Cancelar</button>' : '') +
+             '</div>';
+        h += '<div class="hint">'+(editing>=0
+              ? 'Estás corrigiendo la serie <b>'+(editing+1)+'</b>'
+              : 'Se guarda al instante · descanso de <b>'+S.settings.rest+' s</b>')+'</div>';
         h += '</div></div>';
       }
       h += '</article>';
@@ -749,7 +985,7 @@
   }
 
   /* ============================================================
-     5. VISTA: HISTORIAL
+     7. VISTA: HISTORIAL
      ============================================================ */
   function spark(points){
     if(points.length < 2) return "";
@@ -760,12 +996,12 @@
     if(max === min){ min = max - Math.max(1, max*0.08); }
     var iw = W - pl - pr, ih = H - pt - pb;
     var xy = points.map(function(p,i){
-      return [pl + (points.length===1?iw:iw*i/(points.length-1)), pt + ih - (p.v-min)/(max-min)*ih];
+      return [pl + iw*i/(points.length-1), pt + ih - (p.v-min)/(max-min)*ih];
     });
     var line = xy.map(function(p,i){ return (i?"L":"M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
     var area = line + " L" + xy[xy.length-1][0].toFixed(1) + " " + (pt+ih) + " L" + xy[0][0].toFixed(1) + " " + (pt+ih) + " Z";
     var lastP = xy[xy.length-1];
-    return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Progresión de la serie más pesada">' +
+    return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Progresión de la serie más pesada">' +
       '<defs><linearGradient id="g'+points.length+'" x1="0" y1="0" x2="0" y2="1">' +
       '<stop offset="0" stop-color="#F2A03D" stop-opacity=".26"/>' +
       '<stop offset="1" stop-color="#F2A03D" stop-opacity="0"/></linearGradient></defs>' +
@@ -811,7 +1047,6 @@
     });
     h += '</div>';
 
-    /* progreso por ejercicio */
     var rows = [];
     DAYS.forEach(function(d){
       exercises(d.id).forEach(function(ex){
@@ -836,7 +1071,7 @@
         } else {
           note = "Una sola sesión registrada · haz otra para ver la progresión";
         }
-        rows.push({day:d.name, name:ex.name, best:bestTxt, pts:pts, note:note});
+        rows.push({day:d.name, id:ex.id, name:ex.name, best:bestTxt, pts:pts, note:note});
       });
     });
 
@@ -855,16 +1090,18 @@
   }
 
   /* ============================================================
-     6. VISTA: DATOS
+     8. VISTA: DATOS
      ============================================================ */
   function renderData(){
     var n = 0;
     S.sessions.forEach(function(s){ n += s.sets.length; });
+    var nf = Object.keys(PH).length;
     return '' +
       '<div class="sec"><h2>Copia de seguridad</h2>' +
       '<div class="card warn"><h3>Guarda una copia de vez en cuando</h3>' +
       '<p>Todo vive en el almacenamiento de este navegador: '+S.sessions.length+' sesiones y '+n+' series. ' +
-      'Si borras los datos de Safari o cambias de móvil, se van contigo solo si copias este texto y lo guardas en una nota.</p></div>' +
+      'Si borras los datos de Safari o cambias de móvil, se van contigo solo si copias este texto y lo guardas en una nota.</p>' +
+      '<p>Las fotos que hayas puesto ('+nf+') no entran en la copia, para que el texto siga siendo corto.</p></div>' +
 
       '<div class="card"><h3>Exportar</h3>' +
       '<textarea id="exp" readonly>'+esc(JSON.stringify(S))+'</textarea>' +
@@ -875,6 +1112,12 @@
       '<textarea id="imp" placeholder="Pega aquí el texto de la copia…"></textarea>' +
       '<div class="btnrow"><button class="btn" data-act="import">Importar</button>' +
       '<button class="btn danger" data-act="reset">'+(ui.confirm==="reset"?"¿Seguro? Toca otra vez":"Restaurar datos iniciales")+'</button></div></div>' +
+
+      '<div class="sec"><h2>Fotos</h2>' +
+      '<div class="card"><h3>'+plural(nf,"foto propia","fotos propias")+'</h3>' +
+      '<p>Despliega un ejercicio y toca la imagen para poner la tuya, desde la cámara o el carrete. Se recorta en cuadrado y se guarda comprimida en el propio móvil.</p>' +
+      (nf ? '<div class="btnrow"><button class="btn danger" data-act="rmall">'+(ui.confirm==="rmall"?"¿Seguro? Toca otra vez":"Borrar todas las fotos")+'</button></div>' : '') +
+      '</div></div>' +
 
       '<div class="sec"><h2>Descanso</h2>' +
       '<div class="card"><h3>'+S.settings.rest+' segundos</h3>' +
@@ -889,7 +1132,7 @@
   }
 
   /* ============================================================
-     7. RENDER + EVENTOS
+     9. RENDER + EVENTOS
      ============================================================ */
   function render(){
     $("#today").textContent = fmtDate(todayISO(),{weekday:"long",day:"numeric",month:"long"});
@@ -914,7 +1157,8 @@
   $("#views").addEventListener("click", function(e){
     var b = e.target.closest("button[data-view]");
     if(!b) return;
-    ui.view = b.dataset.view; ui.open = null; ui.confirm = null; ui.edit = false; ui.adding = false;
+    ui.view = b.dataset.view; ui.open = null; ui.confirm = null;
+    ui.edit = false; ui.adding = false; ui.editSet = null;
     window.scrollTo(0,0);
     render();
   });
@@ -922,7 +1166,10 @@
   $("#days").addEventListener("click", function(e){
     var b = e.target.closest("button[data-day]");
     if(!b) return;
-    ui.day = b.dataset.day; ui.open = null; ui.confirm = null; ui.adding = false;
+    ui.day = b.dataset.day; ui.open = null; ui.confirm = null;
+    ui.adding = false; ui.editSet = null;
+    var f = exercises(ui.day)[0];
+    if(f) ui.open = f.id;
     render();
   });
 
@@ -931,12 +1178,36 @@
     if(!b || b.tagName === "INPUT") return;
     var act = b.dataset.act, id = b.dataset.id;
 
-    if(act === "toggle"){ ui.open = (ui.open === id ? null : id); ui.confirm = null; return render(); }
+    if(act === "toggle"){ ui.open = (ui.open === id ? null : id); ui.confirm = null; ui.editSet = null; return render(); }
     if(act === "edit"){ ui.edit = !ui.edit; ui.confirm = null; return render(); }
+
+    if(act === "photo"){ pendingPhoto = id; $("#photoInput").click(); return; }
+    if(act === "rmphoto"){ delete PH[id]; savePhotos(); toast("Foto quitada"); return render(); }
+    if(act === "rmall"){
+      if(ui.confirm !== "rmall"){ ui.confirm = "rmall"; return render(); }
+      PH = {}; savePhotos(); ui.confirm = null; toast("Fotos borradas"); return render();
+    }
+
+    if(act === "repeat"){
+      var prev = prevSession(); if(!prev) return;
+      var t = todaySession(true);
+      prev.sets.forEach(function(s){
+        var c = {ex:s.ex, reps:s.reps};
+        if(s.band) c.band = s.band; else c.w = s.w;
+        t.sets.push(c);
+      });
+      save(); toast("Series cargadas · ajusta lo que cambie"); return render();
+    }
+    if(act === "clear"){
+      if(ui.confirm !== "clear"){ ui.confirm = "clear"; return render(); }
+      var cur = todaySession(false);
+      if(cur) S.sessions = S.sessions.filter(function(x){ return x !== cur; });
+      ui.confirm = null; ui.editSet = null; save(); toast("Sesión de hoy vaciada"); return render();
+    }
 
     if(act === "setmode"){
       var ex = findEx(id); if(!ex) return;
-      ex.mode = b.dataset.m; save(); return render();
+      ex.mode = b.dataset.m; ui.editSet = null; save(); return render();
     }
     if(act === "mode"){
       var ex2 = findEx(id); if(!ex2) return;
@@ -951,17 +1222,23 @@
       var art = b.closest(".ex");
       var input = art.querySelector(b.dataset.t === "w" ? ".wI" : ".rI");
       var d = +b.dataset.d;
-      var cur = parseNum(input.value);
+      var cur2 = parseNum(input.value);
+      if(!isFinite(cur2)) cur2 = 0;
       if(b.dataset.t === "w"){
-        if(!isFinite(cur)) cur = 0;
-        var nv = Math.max(0, Math.round((cur + d*2.5)*10)/10);
+        var nv = Math.max(0, Math.round((cur2 + d*2.5)*10)/10);
         input.value = nv ? num(nv) : "";
       } else {
-        if(!isFinite(cur)) cur = 0;
-        input.value = Math.max(1, Math.round(cur + d));
+        input.value = Math.max(1, Math.round(cur2 + d));
       }
       return;
     }
+    if(act === "editset"){
+      var i = +b.dataset.i;
+      ui.editSet = (ui.editSet && ui.editSet.i === i) ? null : {ex:id, i:i};
+      return render();
+    }
+    if(act === "canceledit"){ ui.editSet = null; return render(); }
+
     if(act === "add"){
       var exA = findEx(id); if(!exA) return;
       var artA = b.closest(".ex");
@@ -969,15 +1246,22 @@
       var reps = Math.round(parseNum(rI.value));
       if(!isFinite(reps) || reps < 1){ toast("Pon las repeticiones"); rI.focus(); return; }
       var rec = {ex:id, reps:reps};
-      if(exA.mode === "banda"){
+      var wI = artA.querySelector(".wI");
+      if(!wI){
         var sel = artA.querySelector('.bands button[aria-pressed="true"]');
         if(!sel){ toast("Elige una banda"); return; }
         rec.band = sel.dataset.b;
       } else {
-        var wI = artA.querySelector(".wI");
         var w = parseNum(wI.value);
         if(!isFinite(w) || w <= 0){ toast("Pon el peso"); wI.focus(); return; }
         rec.w = Math.round(w*100)/100;
+      }
+      if(ui.editSet && ui.editSet.ex === id){
+        var sesE = todaySession(false);
+        if(sesE) sesE.sets[ui.editSet.i] = rec;
+        ui.editSet = null;
+        save(); render(); toast("Serie corregida");
+        return;
       }
       todaySession(true).sets.push(rec);
       save();
@@ -987,17 +1271,18 @@
       return;
     }
     if(act === "rmset"){
-      var ses = todaySession(false); if(!ses) return;
-      ses.sets.splice(+b.dataset.i, 1);
-      if(!ses.sets.length) S.sessions = S.sessions.filter(function(x){ return x !== ses; });
+      var ses2 = todaySession(false); if(!ses2) return;
+      ses2.sets.splice(+b.dataset.i, 1);
+      if(!ses2.sets.length) S.sessions = S.sessions.filter(function(x){ return x !== ses2; });
+      ui.editSet = null;
       save(); return render();
     }
     if(act === "up" || act === "down"){
       var l = exercises(ui.day);
-      var i = l.findIndex(function(x){ return x.id === id; });
-      var j = act === "up" ? i-1 : i+1;
+      var i2 = l.findIndex(function(x){ return x.id === id; });
+      var j = act === "up" ? i2-1 : i2+1;
       if(j < 0 || j >= l.length) return;
-      var tmp = l[i]; l[i] = l[j]; l[j] = tmp;
+      var tmp = l[i2]; l[i2] = l[j]; l[j] = tmp;
       save(); return render();
     }
     if(act === "del"){
@@ -1005,7 +1290,7 @@
       S.routines[ui.day] = exercises(ui.day).filter(function(x){ return x.id !== id; });
       ui.confirm = null; save(); toast("Ejercicio borrado"); return render();
     }
-    if(act === "newex"){ ui.adding = true; render(); var f = $("#newName"); if(f) f.focus(); return; }
+    if(act === "newex"){ ui.adding = true; render(); var f2 = $("#newName"); if(f2) f2.focus(); return; }
     if(act === "cancelex"){ ui.adding = false; return render(); }
     if(act === "createex"){
       var nm = ($("#newName").value || "").trim();
@@ -1031,16 +1316,16 @@
       var raw = ($("#imp").value || "").trim();
       if(!raw){ toast("Pega la copia primero"); return; }
       try{
-        var d = JSON.parse(raw);
-        if(!d.routines || !d.sessions) throw new Error("formato");
-        S = d; if(!S.settings) S.settings = {rest:90};
+        var d2 = JSON.parse(raw);
+        if(!d2.routines || !d2.sessions) throw new Error("formato");
+        S = d2; if(!S.settings) S.settings = {rest:90};
         save(); toast("Datos importados"); return render();
       }catch(err){ toast("Ese texto no es una copia válida"); }
       return;
     }
     if(act === "reset"){
       if(ui.confirm !== "reset"){ ui.confirm = "reset"; return render(); }
-      S = seed(); ui.confirm = null; save(); toast("Datos iniciales restaurados"); return render();
+      S = seed(); ui.confirm = null; ui.editSet = null; save(); toast("Datos iniciales restaurados"); return render();
     }
   });
 
@@ -1062,7 +1347,6 @@
     }
   });
 
-  /* abre el primer ejercicio del día para que la pantalla muestre de qué va */
   var first = exercises(ui.day)[0];
   if(first) ui.open = first.id;
   render();
