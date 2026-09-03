@@ -484,6 +484,10 @@
   .cd.pad{background:transparent;border-color:transparent}
   .cd.hoy{border-color:var(--accent-dim);color:var(--text-2)}
   .cd.on{color:var(--text)}
+  .cd{cursor:pointer;padding:0}
+  .cd[disabled]{opacity:.3;cursor:default}
+  .cd.sel{border-color:var(--accent);background:var(--surface-2);color:var(--text)}
+  .cd .marks{display:flex;gap:2px;justify-content:center}
   .cd em{
     font-style:normal;font-family:var(--cond);font-size:9.5px;font-weight:700;letter-spacing:.04em;
     width:15px;height:15px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#15120F;
@@ -584,6 +588,21 @@
     margin-left:12px;border:none;background:none;padding:0;
     font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.07em;
     text-transform:uppercase;color:var(--accent);
+  }
+
+  .otrodia{
+    display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:11px 13px;
+    border-radius:var(--r);background:rgba(242,160,61,.10);border:1px solid var(--accent-dim);
+  }
+  .otrodia span{flex:1;min-width:0;font-size:12.5px;color:var(--text-2);line-height:1.4}
+  .otrodia b{
+    display:block;font-family:var(--cond);font-size:15px;font-weight:600;color:var(--accent);
+    letter-spacing:.02em;margin-bottom:1px;
+  }
+  .otrodia button{
+    flex:none;min-height:38px;padding:0 14px;border-radius:9px;border:none;background:var(--accent);
+    color:var(--accent-ink);font-family:var(--cond);font-size:13px;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;
   }
 
   [hidden]{display:none!important}
@@ -815,7 +834,7 @@
 
   var S = load();
   var PH = loadPhotos();
-  var ui = { view:"log", day:"empuje", open:null, edit:false, confirm:null, adding:false, editSet:null, mes:null };
+  var ui = { view:"log", day:"empuje", open:null, edit:false, confirm:null, adding:false, editSet:null, mes:null, fecha:null };
   var deshacer = null;
   var pendingPhoto = null;
 
@@ -905,8 +924,12 @@
   function sortedSessions(){
     return S.sessions.slice().sort(function(a,b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
   }
-  function todaySession(create){
-    var t = todayISO();
+  /* el día que se está registrando: hoy salvo que hayas tocado otro en el calendario */
+  function fechaActiva(){ return ui.fecha || todayISO(); }
+  function esHoy(){ return fechaActiva() === todayISO(); }
+
+  function sesionActiva(create){
+    var t = fechaActiva();
     for(var i=0;i<S.sessions.length;i++)
       if(S.sessions[i].date===t && S.sessions[i].routine===ui.day) return S.sessions[i];
     if(!create) return null;
@@ -914,10 +937,14 @@
     S.sessions.push(s);
     return s;
   }
+  /* sesiones del mismo día, sea cual sea la rutina */
+  function sesionesDe(fecha){
+    return S.sessions.filter(function(s){ return s.date === fecha; });
+  }
   function prevSession(){
-    var sorted = sortedSessions(), t = todayISO();
+    var sorted = sortedSessions(), t = fechaActiva();
     for(var i=0;i<sorted.length;i++)
-      if(sorted[i].routine===ui.day && sorted[i].date !== t) return sorted[i];
+      if(sorted[i].routine===ui.day && sorted[i].date < t) return sorted[i];
     return null;
   }
   function setsOf(session, exId){
@@ -925,7 +952,7 @@
     return session.sets.filter(function(s){ return s.ex===exId; });
   }
   function historyOf(exId){
-    var t = todayISO(), out = [];
+    var t = fechaActiva(), out = [];
     S.sessions.forEach(function(s){
       var sets = setsOf(s, exId);
       if(sets.length && s.date !== t) out.push({date:s.date, sets:sets});
@@ -1251,11 +1278,13 @@
     el.hidden = ui.view !== "log";
     if(el.hidden) return;
     el.innerHTML = DAYS.map(function(d){
-      var n = 0, t = todayISO();
+      var n = 0, t = fechaActiva();
       S.sessions.forEach(function(s){ if(s.routine===d.id && s.date===t) n = s.sets.length; });
       var pie;
       if(n){
-        pie = plural(n,"serie hoy","series hoy");
+        pie = esHoy() ? plural(n,"serie hoy","series hoy") : plural(n,"serie","series");
+      } else if(!esHoy()){
+        pie = "sin series";
       } else {
         var u = ultimaDe(d.id);
         var dd = u ? diasEntre(u, t) : null;
@@ -1270,12 +1299,19 @@
   }
 
   function renderLog(){
-    var ses = todaySession(false);
+    var ses = sesionActiva(false);
     var sets = ses ? ses.sets : [];
     var vol = volume(sets);
     var prev = prevSession();
 
-    var h = '<div class="strip">' +
+    var h = "";
+    if(!esHoy()){
+      h += '<div class="otrodia">' +
+        '<span><b>'+esc(capital(fmtDate(fechaActiva(),{weekday:"long",day:"numeric",month:"long"})))+'</b>' +
+        'Estás apuntando en otro día, no en hoy.</span>' +
+        '<button data-act="hoy">Ir a hoy</button></div>';
+    }
+    h += '<div class="strip">' +
       '<div class="k'+(sets.length?"":" zero")+'"><b>'+sets.length+'</b><span>Series</span></div>' +
       '<div class="k'+(vol?"":" zero")+'"><b>'+num(vol,0)+'<small>kg</small></b><span>Volumen</span></div>' +
       (prev ? '<div class="k"><b style="font-size:14px">'+esc(fmtDate(prev.date,{day:"numeric",month:"short"}))+'</b><span>Previa</span></div>' : '') +
@@ -1467,7 +1503,7 @@
     var base = ui.mes || t.slice(0,7);
     var y = +base.slice(0,4), m = +base.slice(5,7);
     var porFecha = {};
-    S.sessions.forEach(function(s){ porFecha[s.date] = s; });
+    S.sessions.forEach(function(s){ (porFecha[s.date] = porFecha[s.date] || []).push(s); });
 
     var primero = new Date(y, m-1, 1);
     var dias = new Date(y, m, 0).getDate();
@@ -1483,14 +1519,21 @@
     for(var i=0;i<offset;i++) h += '<div class="cd pad"></div>';
     for(var d=1; d<=dias; d++){
       var iso = y+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;
-      var ses = porFecha[iso];
-      h += '<div class="cd'+(ses?" on":"")+(iso===t?" hoy":"")+'">' +
-           (ses ? '<em class="'+ses.routine+'">'+esc(dayName(ses.routine).charAt(0))+'</em>' : '') +
-           '<span>'+d+'</span></div>';
+      var ses = porFecha[iso] || [];
+      var futuro = iso > t;
+      var marcas = ses.map(function(x){
+        return '<em class="'+x.routine+'">'+esc(dayName(x.routine).charAt(0))+'</em>';
+      }).join("");
+      h += '<button class="cd'+(ses.length?" on":"")+(iso===t?" hoy":"")+
+           (iso===fechaActiva()&&!esHoy()?" sel":"")+'" data-act="dia" data-d="'+iso+'"'+
+           (futuro?" disabled":"")+' aria-label="'+esc(fmtDate(iso,{day:"numeric",month:"long"}))+
+           (ses.length?" · "+ses.map(function(x){ return dayName(x.routine); }).join(" y "):" · sin entreno")+'">' +
+           (marcas ? '<span class="marks">'+marcas+'</span>' : '') +
+           '<span>'+d+'</span></button>';
     }
     h += '</div><div class="legend">' +
       DAYS.map(function(x){ return '<span><i style="background:var(--r-'+x.id+')"></i>'+esc(x.name)+'</span>'; }).join("") +
-      '</div></div>';
+      '</div><p style="margin-top:10px">Toca un día para apuntar o corregir ese entreno.</p></div>';
     return h;
   }
 
@@ -1783,7 +1826,7 @@
     var dock = $("#dock");
     dock.hidden = ui.view !== "log";
     if(!dock.hidden){
-      var ses = todaySession(false), sets = ses ? ses.sets : [];
+      var ses = sesionActiva(false), sets = ses ? ses.sets : [];
       $("#sum").innerHTML = sets.length
         ? '<b>'+sets.length+'</b> series · <b>'+num(volume(sets),0)+'</b> kg · '+esc(dayName(ui.day))
         : esc(dayName(ui.day)) + ' · sin series todavía';
@@ -1796,7 +1839,7 @@
     if(!b || b.dataset.act !== "undo" || !deshacer) return;
     var d = deshacer;
     deshacer = null;
-    var ses = todaySession(true);
+    var ses = sesionActiva(true);
     ses.sets.splice(Math.min(d.i, ses.sets.length), 0, d.set);
     save();
     $("#toast").classList.remove("on");
@@ -1840,7 +1883,7 @@
 
     if(act === "repeat"){
       var prev = prevSession(); if(!prev) return;
-      var t = todaySession(true);
+      var t = sesionActiva(true);
       prev.sets.forEach(function(s){
         var c = {ex:s.ex, reps:s.reps};
         if(s.band) c.band = s.band; else c.w = s.w;
@@ -1850,9 +1893,9 @@
     }
     if(act === "clear"){
       if(ui.confirm !== "clear"){ ui.confirm = "clear"; return render(); }
-      var cur = todaySession(false);
+      var cur = sesionActiva(false);
       if(cur) S.sessions = S.sessions.filter(function(x){ return x !== cur; });
-      ui.confirm = null; ui.editSet = null; save(); toast("Sesión de hoy vaciada"); return render();
+      ui.confirm = null; ui.editSet = null; save(); toast(esHoy() ? "Sesión de hoy vaciada" : "Día vaciado"); return render();
     }
 
     if(act === "setmode"){
@@ -1907,16 +1950,16 @@
         rec.w = Math.round(w*100)/100;
       }
       if(ui.editSet && ui.editSet.ex === id){
-        var sesE = todaySession(false);
+        var sesE = sesionActiva(false);
         if(sesE) sesE.sets[ui.editSet.i] = rec;
         ui.editSet = null;
         save(); render(); toast("Serie corregida");
         return;
       }
       var recordPrevio = recordDe(id, false);
-      todaySession(true).sets.push(rec);
+      sesionActiva(true).sets.push(rec);
       save();
-      if(S.settings.autoRest) startRest();
+      if(S.settings.autoRest && esHoy()) startRest();
       render();
       if(rec.w && (!recordPrevio || rec.w > recordPrevio.w ||
                    (rec.w === recordPrevio.w && rec.reps > recordPrevio.reps))){
@@ -1928,7 +1971,7 @@
       return;
     }
     if(act === "rmset"){
-      var ses2 = todaySession(false); if(!ses2) return;
+      var ses2 = sesionActiva(false); if(!ses2) return;
       var idx = +b.dataset.i;
       deshacer = {i:idx, set:ses2.sets[idx]};
       ses2.sets.splice(idx, 1);
@@ -1992,6 +2035,26 @@
     }
 
     /* --- calendario --- */
+    if(act === "dia"){
+      var f = b.dataset.d;
+      if(f > todayISO()) return;
+      ui.fecha = (f === todayISO()) ? null : f;
+      var ses = sesionesDe(f);
+      if(ses.length) ui.day = ses[0].routine;      /* abre la rutina que hiciste ese día */
+      ui.view = "log"; ui.open = null; ui.confirm = null; ui.editSet = null; ui.edit = false;
+      var pr = exercises(ui.day)[0];
+      if(pr) ui.open = pr.id;
+      window.scrollTo(0,0);
+      render();
+      if(!esHoy()) toast(capital(fmtDate(f,{weekday:"long",day:"numeric",month:"short"})));
+      return;
+    }
+    if(act === "hoy"){
+      ui.fecha = null; ui.open = null; ui.confirm = null; ui.editSet = null;
+      var ph = exercises(ui.day)[0];
+      if(ph) ui.open = ph.id;
+      return render();
+    }
     if(act === "mes"){
       var base = ui.mes || todayISO().slice(0,7);
       var y = +base.slice(0,4), mm = +base.slice(5,7) + (+b.dataset.d);
@@ -2086,7 +2149,7 @@
     }
 
     if(e.target.id === "nota"){
-      var sesN = todaySession(false);
+      var sesN = sesionActiva(false);
       if(sesN){ sesN.nota = e.target.value.trim(); save(); }
       return;
     }
