@@ -2337,7 +2337,10 @@
 
   var sitio = leerUI();
   if(sitio.day && S.routines[sitio.day]) ui.day = sitio.day;
-  if(sitio.open && findEx(sitio.open)) ui.open = sitio.open;
+  /* si hoy has entrenado otro bloque, te abre ese y no uno vacío */
+  var hoySes = entrenoDeHoy();
+  if(hoySes && !sesionActiva(false)) ui.day = hoySes.routine;
+  if(sitio.open && findEx(sitio.open) && exercises(ui.day).some(function(x){ return x.id === sitio.open; })) ui.open = sitio.open;
   else { var first = exercises(ui.day)[0]; if(first) ui.open = first.id; }
   retomarDescanso(sitio.fin, sitio.total);
   render();
