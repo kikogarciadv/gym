@@ -879,7 +879,7 @@
 
   var S = load();
   var PH = loadPhotos();
-  var ui = { view:"log", day:"empuje", open:null, edit:false, confirm:null, adding:false, editSet:null, mes:null, fecha:null };
+  var ui = { view:"log", day:"empuje", open:null, edit:false, confirm:null, adding:false, editSet:null, mes:null, fecha:null, openSes:null };
   var deshacer = null;
   var pendingPhoto = null;
 
@@ -926,9 +926,30 @@
     return d;
   }
   function save(){
-    try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+    try{
+      S.updatedAt = Date.now();
+      localStorage.setItem(KEY, JSON.stringify(S));
+      if(window.__nube && window.__nube.empujar) window.__nube.empujar();
+    }
     catch(e){ toast("No se pudo guardar"); }
   }
+
+  /* ---- puente con la sincronización (ver el bloque de la nube al final) ---- */
+  window.__appEstado = function(){
+    return { json: JSON.stringify(S), updatedAt: S.updatedAt || 0 };
+  };
+  window.__appAplicar = function(json){
+    try{
+      var d = JSON.parse(json);
+      if(!d || !d.routines || !d.sessions) return false;
+      S = migrar(d);
+      localStorage.setItem(KEY, JSON.stringify(S));
+      render();
+      return true;
+    }catch(e){ return false; }
+  };
+  window.__appRefrescar = function(){ if(ui.view === "perfil") render(); };
+  window.__appAviso = function(msg){ toast(msg); };
   /* dónde estabas: bloque, ejercicio abierto y descanso en marcha */
   function guardarUI(){
     try{
@@ -1707,7 +1728,7 @@
       h += '<div class="empty"><b>Todavía nada</b>Registra tu primera serie en la pestaña Entreno.</div>';
     }
     list.forEach(function(s){
-      var open = ui.open === s.id;
+      var open = ui.openSes === s.id;
       var byEx = {};
       s.sets.forEach(function(st){ (byEx[st.ex] = byEx[st.ex] || []).push(st); });
       var vol = volume(s.sets);
@@ -1799,6 +1820,59 @@
       '<span class="v">'+(ult ? num(ult.v,1)+' <small style="font-size:11px;color:var(--text-3)">'+esc(unidad)+'</small>' : '<span style="color:var(--text-3)">—</span>')+'</span>' +
       '<span class="c '+cls+'">'+(dif === null ? '' : (dif>0?"+":"")+num(dif,1))+'</span>' +
       '</div>';
+  }
+
+  function renderNube(){
+    var n = window.__nube;
+    var e = n ? n.estado() : {fase:"cargando"};
+    var h = '<div class="sec"><h2>Sincronización</h2><div class="card">';
+
+    if(e.fase === "sinconfig"){
+      h += '<h3>Guardar en la nube</h3>' +
+        '<p>Para que tus entrenos se guarden solos y puedas abrir la app en otro móvil, hay que enlazarla con tu proyecto de Firebase. Pega aquí la configuración que te da Google y ya no tendrás que volver a hacerlo.</p>' +
+        '<textarea id="fbcfg" placeholder="Pega aquí el bloque que empieza por { apiKey: ..."></textarea>' +
+        '<div class="btnrow"><button class="btn primary" data-act="nubecfg">Enlazar</button></div>';
+    } else if(e.fase === "cargando"){
+      h += '<h3>Conectando…</h3><p>Cargando la sincronización. Si no hay cobertura se queda en local y no pasa nada: puedes entrenar igual.</p>';
+    } else if(e.fase === "error"){
+      h += '<h3>Sin conexión con la nube</h3>' +
+        '<p>No se ha podido cargar la sincronización'+(e.msg?' ('+esc(e.msg)+')':'')+'. La app funciona igual y tus datos siguen en el móvil. Se reintenta al abrirla otra vez.</p>' +
+        '<div class="btnrow"><button class="btn danger" data-act="nubequitar">Desenlazar proyecto</button></div>';
+    } else if(e.fase === "fuera"){
+      h += '<h3>Entra con tu correo</h3>' +
+        '<p>Usa el mismo correo y contraseña en todos tus dispositivos. La primera vez, dale a Crear cuenta.</p>' +
+        '<div class="frm">' +
+        '<div class="f wide"><label for="fbmail">Correo</label>' +
+        '<input id="fbmail" type="email" autocomplete="username" placeholder="tucorreo@gmail.com"></div>' +
+        '<div class="f wide"><label for="fbpass">Contraseña</label>' +
+        '<input id="fbpass" type="password" autocomplete="current-password" placeholder="mínimo 6 caracteres"></div>' +
+        '</div>' +
+        '<div class="btnrow"><button class="btn primary" data-act="nubeentrar">Entrar</button>' +
+        '<button class="btn" data-act="nubecrear">Crear cuenta</button></div>' +
+        '<div class="btnrow"><button class="btn danger" data-act="nubequitar">Desenlazar proyecto</button></div>';
+    } else {
+      var cuando = e.ultima ? fmtHora(e.ultima) : "—";
+      h += '<h3>Sincronizado</h3>' +
+        '<div class="mlist"><div class="mrow2"><span class="d">Cuenta</span>' +
+        '<span class="v" style="font-size:13px;font-family:var(--sans)">'+esc(e.email||"")+'</span></div>' +
+        '<div class="mrow2"><span class="d">Última</span><span class="v" style="font-size:13px">'+esc(cuando)+'</span></div>' +
+        '<div class="mrow2"><span class="d">Estado</span><span class="v" style="font-size:13px;font-family:var(--sans);color:'+
+        (e.error ? "var(--danger)" : "var(--good)")+'">'+esc(e.error || "al día")+'</span></div></div>' +
+        '<p style="margin-top:10px">Se guarda sola cada vez que apuntas algo. Si entrenas sin cobertura, se sube en cuanto vuelvas a tener.</p>' +
+        '<div class="btnrow"><button class="btn primary" data-act="nubesync">Sincronizar ahora</button>' +
+        '<button class="btn" data-act="nubesalir">Cerrar sesión</button></div>';
+    }
+    h += '</div></div>';
+    return h;
+  }
+
+  function fmtHora(ms){
+    var d = new Date(ms), hoy = new Date();
+    var mismoDia = d.toDateString() === hoy.toDateString();
+    var hh = d.getHours(), mm = d.getMinutes();
+    var hora = hh + ":" + (mm<10?"0":"") + mm;
+    return mismoDia ? "hoy a las " + hora
+                    : d.toLocaleDateString("es-ES",{day:"numeric",month:"short"}) + " a las " + hora;
   }
 
   function renderPerfil(){
@@ -1914,6 +1988,9 @@
       '<button data-act="setrest">Guardar</button></div>' +
       '</div></div>';
 
+    /* --- sincronización en la nube --- */
+    h += renderNube();
+
     /* --- copia de seguridad --- */
     var n = 0;
     S.sessions.forEach(function(s){ n += s.sets.length; });
@@ -1989,8 +2066,9 @@
   $("#views").addEventListener("click", function(e){
     var b = e.target.closest("button[data-view]");
     if(!b) return;
-    ui.view = b.dataset.view; ui.open = null; ui.confirm = null;
+    ui.view = b.dataset.view; ui.confirm = null;
     ui.edit = false; ui.adding = false; ui.editSet = null;
+    if(ui.view !== "prog") ui.openSes = null;
     window.scrollTo(0,0);
     render();
   });
@@ -2012,6 +2090,10 @@
     var act = b.dataset.act, id = b.dataset.id;
 
     if(act === "toggle"){
+      if(ui.view === "prog"){
+        ui.openSes = (ui.openSes === id ? null : id);
+        ui.confirm = null; return render();
+      }
       ui.open = (ui.open === id ? null : id);
       ui.confirm = null; ui.editSet = null; guardarUI(); return render();
     }
@@ -2027,7 +2109,7 @@
     if(act === "rmses"){
       if(ui.confirm !== id){ ui.confirm = id; return render(); }
       S.sessions = S.sessions.filter(function(x){ return x.id !== id; });
-      ui.confirm = null; ui.open = null; save();
+      ui.confirm = null; ui.openSes = null; save();
       toast("Entreno borrado");
       return render();
     }
@@ -2269,6 +2351,32 @@
       return;
     }
 
+    /* --- nube --- */
+    if(act === "nubecfg"){
+      var txt = ($("#fbcfg").value || "").trim();
+      if(!txt){ toast("Pega la configuración primero"); return; }
+      if(!window.__nube || !window.__nube.configurar){ toast("Recarga la app e inténtalo otra vez"); return; }
+      var ok = window.__nube.configurar(txt);
+      toast(ok ? "Enlazado · ahora entra con tu correo" : "Esa configuración no vale");
+      return render();
+    }
+    if(act === "nubeentrar" || act === "nubecrear"){
+      var mail = ($("#fbmail").value || "").trim();
+      var pass = $("#fbpass").value || "";
+      if(!mail || pass.length < 6){ toast("Correo y contraseña de 6 o más"); return; }
+      window.__nube.acceder(mail, pass, act === "nubecrear");
+      toast("Un momento…");
+      return;
+    }
+    if(act === "nubesalir"){ window.__nube.salir(); return; }
+    if(act === "nubesync"){ window.__nube.empujar(true); toast("Sincronizando…"); return; }
+    if(act === "nubequitar"){
+      if(ui.confirm !== "nubequitar"){ ui.confirm = "nubequitar"; return render(); }
+      window.__nube.desenlazar(); ui.confirm = null;
+      toast("Proyecto desenlazado");
+      return render();
+    }
+
     if(act === "reset"){
       if(ui.confirm !== "reset"){ ui.confirm = "reset"; return render(); }
       S = seed(); ui.confirm = null; ui.editSet = null; save(); toast("Datos iniciales restaurados"); return render();
@@ -2344,6 +2452,161 @@
   else { var first = exercises(ui.day)[0]; if(first) ui.open = first.id; }
   retomarDescanso(sitio.fin, sitio.total);
   render();
+})();
+</script>
+
+<script type="module">
+/* ============================================================
+   SINCRONIZACIÓN EN LA NUBE (Firebase)
+   Va aparte a propósito: si esto falla —sin cobertura, sin
+   configurar, servicio caído— la app de arriba funciona igual
+   y los datos siguen guardados en el móvil.
+   ============================================================ */
+(async function(){
+  "use strict";
+  var CKEY = "bitacora-nube-v1";          /* configuración del proyecto */
+  var SKEY = "bitacora-nube-estado-v1";   /* hora de la última subida   */
+
+  /* Si algún día se deja fija la configuración, va aquí y el usuario
+     no tiene que pegar nada en ningún dispositivo. */
+  var FIJA = null;
+
+  var estado = { fase:"cargando", email:null, ultima:0, error:null };
+  var cfg = null, db = null, auth = null, ref = null, api = {};
+  var tempo = null, uid = null, aplicando = false;
+
+  function guardarEstado(){
+    try{ localStorage.setItem(SKEY, String(estado.ultima || 0)); }catch(e){}
+  }
+  function pintar(){ if(window.__appRefrescar) window.__appRefrescar(); }
+  function leerCfg(){
+    if(FIJA) return FIJA;
+    try{ return JSON.parse(localStorage.getItem(CKEY) || "null"); }catch(e){ return null; }
+  }
+  /* acepta tanto JSON limpio como el bloque tal cual lo copia uno de la consola */
+  function interpretar(txt){
+    try{
+      var t = txt.replace(/^[\s\S]*?\{/, "{").replace(/;[\s\S]*$/, "").trim();
+      var obj = (new Function("return (" + t + ")"))();
+      if(obj && obj.apiKey && obj.projectId) return obj;
+    }catch(e){}
+    return null;
+  }
+
+  window.__nube = {
+    estado: function(){ return estado; },
+    configurar: function(txt){
+      var obj = interpretar(txt);
+      if(!obj) return false;
+      try{ localStorage.setItem(CKEY, JSON.stringify(obj)); }catch(e){ return false; }
+      setTimeout(function(){ location.reload(); }, 600);
+      return true;
+    },
+    desenlazar: function(){
+      try{ localStorage.removeItem(CKEY); localStorage.removeItem(SKEY); }catch(e){}
+      setTimeout(function(){ location.reload(); }, 400);
+    },
+    acceder: function(){ },
+    salir: function(){ },
+    empujar: function(){ }
+  };
+
+  cfg = leerCfg();
+  try{ estado.ultima = +(localStorage.getItem(SKEY) || 0); }catch(e){}
+
+  if(!cfg){ estado.fase = "sinconfig"; pintar(); return; }
+
+  var V = "https://www.gstatic.com/firebasejs/10.12.2/";
+  try{
+    var mApp  = await import(V + "firebase-app.js");
+    var mAuth = await import(V + "firebase-auth.js");
+    var mDb   = await import(V + "firebase-firestore.js");
+    api = { app:mApp, auth:mAuth, db:mDb };
+
+    var app = mApp.initializeApp(cfg);
+    auth = mAuth.getAuth(app);
+    db   = mDb.getFirestore(app);
+    await mAuth.setPersistence(auth, mAuth.browserLocalPersistence).catch(function(){});
+  }catch(err){
+    estado.fase = "error";
+    estado.msg = (err && err.message ? err.message : "no se pudo cargar").slice(0,90);
+    pintar();
+    return;
+  }
+
+  function subir(forzar){
+    if(!ref || aplicando) return;
+    clearTimeout(tempo);
+    tempo = setTimeout(async function(){
+      try{
+        var e = window.__appEstado();
+        await api.db.setDoc(ref, { data: e.json, updatedAt: e.updatedAt || Date.now() });
+        estado.ultima = Date.now(); estado.error = null; guardarEstado(); pintar();
+      }catch(err){
+        estado.error = "sin subir (se reintenta)";
+        pintar();
+      }
+    }, forzar ? 0 : 1800);
+  }
+
+  function escuchar(){
+    api.db.onSnapshot(ref, function(snap){
+      if(!snap.exists()){ subir(true); return; }
+      var r = snap.data() || {};
+      var mio = window.__appEstado();
+      if(!r.data) return;
+      if((r.updatedAt || 0) > (mio.updatedAt || 0)){
+        aplicando = true;
+        var ok = window.__appAplicar(r.data);
+        aplicando = false;
+        if(ok){
+          estado.ultima = Date.now(); estado.error = null; guardarEstado();
+          if(window.__appAviso) window.__appAviso("Datos actualizados desde la nube");
+        }
+      } else if((mio.updatedAt || 0) > (r.updatedAt || 0)){
+        subir(true);
+      }
+      pintar();
+    }, function(){
+      estado.error = "sin conexión";
+      pintar();
+    });
+  }
+
+  api.auth.onAuthStateChanged(auth, function(user){
+    if(user){
+      uid = user.uid;
+      estado.fase = "dentro"; estado.email = user.email; estado.error = null;
+      ref = api.db.doc(db, "bitacoras", uid);
+      escuchar();
+      subir(false);
+    } else {
+      uid = null; ref = null;
+      estado.fase = "fuera"; estado.email = null;
+    }
+    pintar();
+  });
+
+  window.__nube.acceder = async function(mail, pass, crear){
+    try{
+      if(crear) await api.auth.createUserWithEmailAndPassword(auth, mail, pass);
+      else      await api.auth.signInWithEmailAndPassword(auth, mail, pass);
+    }catch(err){
+      var c = (err && err.code) || "";
+      var m = c.indexOf("email-already-in-use") > -1 ? "Ese correo ya existe: dale a Entrar"
+            : c.indexOf("invalid-credential") > -1 || c.indexOf("wrong-password") > -1 ? "Correo o contraseña incorrectos"
+            : c.indexOf("user-not-found") > -1 ? "No existe: dale a Crear cuenta"
+            : c.indexOf("weak-password") > -1 ? "Contraseña muy corta"
+            : c.indexOf("invalid-email") > -1 ? "Ese correo no vale"
+            : c.indexOf("network") > -1 ? "Sin conexión"
+            : "No se ha podido entrar";
+      if(window.__appAviso) window.__appAviso(m);
+    }
+  };
+  window.__nube.salir = async function(){
+    try{ await api.auth.signOut(auth); if(window.__appAviso) window.__appAviso("Sesión cerrada"); }catch(e){}
+  };
+  window.__nube.empujar = function(forzar){ subir(forzar); };
 })();
 </script>
 
