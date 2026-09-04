@@ -2467,9 +2467,16 @@
   var CKEY = "bitacora-nube-v1";          /* configuración del proyecto */
   var SKEY = "bitacora-nube-estado-v1";   /* hora de la última subida   */
 
-  /* Si algún día se deja fija la configuración, va aquí y el usuario
-     no tiene que pegar nada en ningún dispositivo. */
-  var FIJA = null;
+  /* Configuración fija del proyecto: así el usuario no tiene que
+     pegar nada en ningún dispositivo, solo iniciar sesión. */
+  var FIJA = {
+    apiKey: "AIzaSyBymWiRtnuoD9T9Eh6TBfmXfVFJv6YMelY",
+    authDomain: "bitacora-fe801.firebaseapp.com",
+    projectId: "bitacora-fe801",
+    storageBucket: "bitacora-fe801.firebasestorage.app",
+    messagingSenderId: "732222748643",
+    appId: "1:732222748643:web:2fcf852dd728c5779912d6"
+  };
 
   var estado = { fase:"cargando", email:null, ultima:0, error:null };
   var cfg = null, db = null, auth = null, ref = null, api = {};
